@@ -49,10 +49,10 @@ type postLoginRequest struct {
 // postLogin runs the declarative claims block and then every deployed
 // post-login Action. It answers the token request itself when an Action
 // denies or fails, and reports whether the caller may go on to issue tokens.
-func (s *Server) postLogin(w http.ResponseWriter, r *http.Request, user *config.User, clientID, orgID, authorizeQuery, protocol string, idClaims, accessClaims jwt.MapClaims) bool {
+func (s *Server) postLogin(w http.ResponseWriter, r *http.Request, user *config.User, clientID, orgID, authorizeQuery, protocol string, requestedScopes []string, idClaims, accessClaims jwt.MapClaims) bool {
 	client := s.lookupClient(clientID)
 	s.applyPostLogin(user, client, orgID, idClaims, accessClaims)
-	req := requestFromToken(r, authorizeQuery, protocol)
+	req := requestFromToken(r, authorizeQuery, protocol, requestedScopes)
 	for _, b := range s.actions.listBindings(TriggerPostLogin) {
 		if b.Action.DeployedVersion == nil {
 			continue // bound but not deployed: Auth0 skips it too
@@ -398,7 +398,7 @@ var secretBodyFields = map[string]bool{"code": true, "code_verifier": true, "cli
 
 // requestFromToken is the post-login request for a token exchange: the
 // original /authorize query when there was one, else only the token form.
-func requestFromToken(r *http.Request, authorizeQuery, protocol string) postLoginRequest {
+func requestFromToken(r *http.Request, authorizeQuery, protocol string, requestedScopes []string) postLoginRequest {
 	req := postLoginRequest{Protocol: protocol, Method: r.Method, Host: r.Host, UA: r.UserAgent(), IP: clientIP(r), Query: map[string]string{}, Body: map[string]string{}}
 	for k, v := range r.Form {
 		if len(v) > 0 && !secretBodyFields[k] {
@@ -414,6 +414,9 @@ func requestFromToken(r *http.Request, authorizeQuery, protocol string) postLogi
 		req.Scopes = strings.Fields(q.Get("scope"))
 		req.RedirectURI = q.Get("redirect_uri")
 		req.LoginHint = q.Get("login_hint")
+	}
+	if requestedScopes != nil {
+		req.Scopes = append([]string(nil), requestedScopes...)
 	}
 	return req
 }
