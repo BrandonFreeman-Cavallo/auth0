@@ -1,0 +1,75 @@
+{
+  "name": "Auth0 Mock Development",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:4": {
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "latest",
+      "helm": "3.21.0",
+      "minikube": "none"
+    }
+  },
+  "runArgs": [
+    "--privileged"
+  ],
+  "overrideCommand": true,
+  "remoteUser": "vscode",
+  "containerEnv": {
+    "GOMODCACHE": "/home/vscode/go/pkg/mod",
+    "GOCACHE": "/home/vscode/.cache/go-build"
+  },
+  "mounts": [
+    "source=auth0-go-mod-cache,target=/home/vscode/go/pkg/mod,type=volume",
+    "source=auth0-go-build-cache,target=/home/vscode/.cache/go-build,type=volume"
+  ],
+  "forwardPorts": [
+    80,
+    443,
+    3000,
+    4646,
+    10350
+  ],
+  "portsAttributes": {
+    "80": {
+      "label": "Kind ingress HTTP",
+      "onAutoForward": "notify"
+    },
+    "443": {
+      "label": "Kind ingress HTTPS",
+      "onAutoForward": "notify"
+    },
+    "4646": {
+      "label": "Auth0 mock",
+      "onAutoForward": "notify"
+    },
+    "10350": {
+      "label": "Tilt UI",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "go mod download",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "ms-azuretools.vscode-containers",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "redhat.vscode-yaml",
+        "tilt-dev.tilt-vscode"
+      ],
+      "settings": {
+        "go.lintTool": "golangci-lint",
+        "go.lintOnSave": "package",
+        "go.testFlags": [
+          "-race"
+        ]
+      }
+    }
+  }
+}

@@ -53,6 +53,21 @@ just kind
 just ci
 ```
 
+### Dev Container
+
+Open this repository in VS Code and choose **Reopen in Container**. The container includes Go 1.24,
+Docker, Kind, `kubectl`, Helm, Tilt, `mkcert`, `just`, and `golangci-lint`. Go modules and build
+artifacts use named volumes so rebuilds stay fast.
+
+```bash
+just ci
+just docker
+just kind
+```
+
+For the Kind ingress URLs, add `127.0.0.1 auth.46labs.test api.46labs.test` to the host machine's
+`/etc/hosts`. The `just kind` helper can only update `/etc/hosts` inside the container.
+
 ## Development Modes
 
 ### Docker (Simple)
