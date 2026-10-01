@@ -2,7 +2,7 @@ issuer: "https://auth.nextel.test/"
 audience: "https://api.nextel.test"
 port: 3001
 corsOrigins:
-  - "*"
+- "*"
 
 branding:
   serviceName: "Nextel"
@@ -11,158 +11,158 @@ branding:
   subtitle: "Sign in to your account"
 
 users:
-  - user_id: "auth0|user_devone"
-    email: "dev.one@nextel.test"
-    phone: "+14695550001"
-    name: "Dev One"
-    email_verified: true
-    identities:
-      - connection: "sms"
-        provider: "sms"
-        user_id: "user_devone"
-        isSocial: false
-    app_metadata:
-      tenant_id: "org_nextel_test"
-      role: "admin"
-    organizations:
-      - "org_nextel_test"
+- user_id: "auth0|user_devone"
+  email: "dev.one@nextel.test"
+  phone: "+14695550001"
+  name: "Dev One"
+  email_verified: true
+  identities:
+  - connection: "sms"
+    provider: "sms"
+    user_id: "user_devone"
+    isSocial: false
+  app_metadata:
+    tenant_id: "org_nextel_test"
+    role: "admin"
+  organizations:
+  - "org_nextel_test"
 
-  - user_id: "auth0|user_devtwo"
-    email: "dev.two@nextel.test"
-    phone: "+17135550002"
-    name: "Dev Two"
-    email_verified: true
-    identities:
-      - connection: "email"
-        provider: "email"
-        user_id: "user_devtwo"
-        isSocial: false
-    app_metadata:
-      tenant_id: "org_nextel_test"
-      role: "member"
-    organizations:
-      - "org_nextel_test"
+- user_id: "auth0|user_devtwo"
+  email: "dev.two@nextel.test"
+  phone: "+17135550002"
+  name: "Dev Two"
+  email_verified: true
+  identities:
+  - connection: "email"
+    provider: "email"
+    user_id: "user_devtwo"
+    isSocial: false
+  app_metadata:
+    tenant_id: "org_nextel_test"
+    role: "member"
+  organizations:
+  - "org_nextel_test"
 
-  - user_id: "auth0|user_devthree"
-    email: "dev.three@nextel.test"
-    phone: "+12105550003"
-    name: "Dev Three"
-    email_verified: true
-    identities:
-      - connection: "sms"
-        provider: "sms"
-        user_id: "user_devthree"
-        isSocial: false
-    app_metadata:
-      tenant_id: "org_nextel_test"
-      role: "member"
-    organizations:
-      - "org_nextel_test"
+- user_id: "auth0|user_devthree"
+  email: "dev.three@nextel.test"
+  phone: "+12105550003"
+  name: "Dev Three"
+  email_verified: true
+  identities:
+  - connection: "sms"
+    provider: "sms"
+    user_id: "user_devthree"
+    isSocial: false
+  app_metadata:
+    tenant_id: "org_nextel_test"
+    role: "member"
+  organizations:
+  - "org_nextel_test"
 
 organizations:
-  - id: "org_nextel_test"
-    name: "nextel-test"
-    display_name: "Nextel Test Organization"
-    branding:
-      primary_color: "#FFD100"
-    metadata:
-      tenant_id: "tenant_abc123"
+- id: "org_nextel_test"
+  name: "nextel-test"
+  display_name: "Nextel Test Organization"
+  branding:
+    primary_color: "#FFD100"
+  metadata:
+    tenant_id: "tenant_abc123"
 
 connections:
-  - id: "con_sms"
-    name: "sms"
-    strategy: "sms"
-    display_name: "SMS"
-    is_domain_connection: false
-    enabled_clients:
-      - "*"
-    organizations:
-      - "org_nextel_test"
+- id: "con_sms"
+  name: "sms"
+  strategy: "sms"
+  display_name: "SMS"
+  is_domain_connection: false
+  enabled_clients:
+  - "*"
+  organizations:
+  - "org_nextel_test"
 
-  - id: "con_email"
-    name: "email"
-    strategy: "email"
-    display_name: "Email"
-    is_domain_connection: false
-    enabled_clients:
-      - "*"
-    organizations:
-      - "org_nextel_test"
+- id: "con_email"
+  name: "email"
+  strategy: "email"
+  display_name: "Email"
+  is_domain_connection: false
+  enabled_clients:
+  - "*"
+  organizations:
+  - "org_nextel_test"
 
-  # Organization invitations are invalid against a passwordless connection, so
-  # a non-passwordless one has to exist for the invite flow to be modelled at
-  # all. Both connections above are passwordless.
-  - id: "con_enterprise"
-    name: "enterprise-sso"
-    strategy: "oidc"
-    display_name: "Enterprise SSO"
-    is_domain_connection: false
-    enabled_clients:
-      - "*"
-    organizations:
-      - "org_nextel_test"
+# Organization invitations are invalid against a passwordless connection, so
+# a non-passwordless one has to exist for the invite flow to be modelled at
+# all. Both connections above are passwordless.
+- id: "con_enterprise"
+  name: "enterprise-sso"
+  strategy: "oidc"
+  display_name: "Enterprise SSO"
+  is_domain_connection: false
+  enabled_clients:
+  - "*"
+  organizations:
+  - "org_nextel_test"
 
 # The role registry. pee resolves its admin carrier role by name at runtime.
 roles:
-  - id: "rol_superadmin"
-    name: "superadmin"
-    description: "Platform superadmin"
-  - id: "rol_admin"
-    name: "admin"
-    description: "Tenant admin"
-  - id: "rol_user"
-    name: "user"
-    description: "Read-only tenant user"
+- id: "rol_superadmin"
+  name: "superadmin"
+  description: "Platform superadmin"
+- id: "rol_admin"
+  name: "admin"
+  description: "Tenant admin"
+- id: "rol_user"
+  name: "user"
+  description: "Read-only tenant user"
 
 # Auto-membership is the primary onboarding path: authenticating against the
 # enterprise connection joins the org without an invitation.
 organizationConnections:
-  - org_id: "org_nextel_test"
-    connection_id: "con_enterprise"
-    assign_membership_on_login: true
+- org_id: "org_nextel_test"
+  connection_id: "con_enterprise"
+  assign_membership_on_login: true
 
 members:
-  - user_id: "auth0|user_devone"
-    org_id: "org_nextel_test"
-    role: "admin"
+- user_id: "auth0|user_devone"
+  org_id: "org_nextel_test"
+  role: "admin"
 
-  - user_id: "auth0|user_devtwo"
-    org_id: "org_nextel_test"
-    role: "member"
+- user_id: "auth0|user_devtwo"
+  org_id: "org_nextel_test"
+  role: "member"
 
-  - user_id: "auth0|user_devthree"
-    org_id: "org_nextel_test"
-    role: "member"
+- user_id: "auth0|user_devthree"
+  org_id: "org_nextel_test"
+  role: "member"
 
 clients:
-  - client_id: "dev_web_app"
-    name: "Dev Web App"
-    description: "Development web application"
-    app_type: "spa"
-    callbacks:
-      - "http://localhost:3000/callback"
-    grant_types:
-      - "authorization_code"
-    # Required on the client an invitation names: Auth0 roots the
-    # invitation_url at it and rejects invitation creation without it.
-    initiate_login_uri: "https://localhost:3000/login"
+- client_id: "dev_web_app"
+  name: "Dev Web App"
+  description: "Development web application"
+  app_type: "spa"
+  callbacks:
+  - "http://localhost:3000/callback"
+  grant_types:
+  - "authorization_code"
+  # Required on the client an invitation names: Auth0 roots the
+  # invitation_url at it and rejects invitation creation without it.
+  initiate_login_uri: "https://localhost:3000/login"
 
-  - client_id: "dev_m2m_client"
-    name: "Dev M2M Client"
-    description: "Development M2M client for API access"
-    app_type: "non_interactive"
-    client_secret: "dev_client_secret_123"
-    grant_types:
-      - "client_credentials"
+- client_id: "dev_m2m_client"
+  name: "Dev M2M Client"
+  description: "Development M2M client for API access"
+  app_type: "non_interactive"
+  client_secret: "dev_client_secret_123"
+  grant_types:
+  - "client_credentials"
 
-  # Device authorization is for native/public clients. No client secret is
-  # required for this grant.
-  - client_id: "dev_device_client"
-    name: "Dev Device Client"
-    description: "Development native client for device authorization"
-    app_type: "native"
-    grant_types:
-      - "urn:ietf:params:oauth:grant-type:device_code"
+# Device authorization is for native/public clients. No client secret is
+# required for this grant.
+- client_id: "dev_device_client"
+  name: "Dev Device Client"
+  description: "Development native client for device authorization"
+  app_type: "native"
+  grant_types:
+  - "urn:ietf:params:oauth:grant-type:device_code"
 
 actions:
   post_login:

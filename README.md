@@ -5,6 +5,7 @@ Full-featured OIDC provider mock with Auth0-compatible API for local development
 ## Features
 
 ### OIDC & OAuth2
+
 - Complete OIDC/OAuth2 implementation (discovery, JWKS, authorize, token, userinfo)
 - PKCE support
 - SMS and email passwordless authentication
@@ -15,6 +16,7 @@ Full-featured OIDC provider mock with Auth0-compatible API for local development
 - Multi-tenancy with organizations
 
 ### Auth0 Management API Mock
+
 - Organizations CRUD (`/api/v2/organizations`)
 - Organization invitations: create, list, read, revoke
 - Organization enabled connections (`/api/v2/organizations/:id/enabled_connections`)
@@ -26,6 +28,7 @@ Full-featured OIDC provider mock with Auth0-compatible API for local development
 - Page-based pagination (`page`, `per_page`) on every list endpoint
 
 ### Organization login
+
 - Org-scoped login via the `organization` authorize parameter, gated on membership
 - `assign_membership_on_login` so a directory self-serves into an organization
 - Invitation acceptance via the `invitation` parameter: creates the user, joins the
@@ -34,6 +37,7 @@ Full-featured OIDC provider mock with Auth0-compatible API for local development
   production Post-Login Action
 
 ### Developer Experience
+
 - Dynamic login UI supporting both email and SMS
 - Customizable branding and templates
 - Configurable via YAML or environment variables
@@ -72,12 +76,14 @@ For the Kind ingress URLs, add `127.0.0.1 auth.46labs.test api.46labs.test` to t
 ## Development Modes
 
 ### Docker (Simple)
+
 ```bash
 just docker  # Runs on http://localhost:4646
 just down    # Stop container
 ```
 
 ### Kind + Tilt (Full Stack)
+
 ```bash
 just kind    # Creates cluster, ingress, TLS, starts Tilt
 # Access: https://auth.46labs.test
@@ -85,6 +91,7 @@ just down    # Destroy cluster
 ```
 
 Tilt provides:
+
 - Hot-reload on code changes
 - Web UI at http://localhost:10350
 - Full ingress + TLS setup
@@ -98,6 +105,7 @@ ISSUER=https://auth.example.com/
 AUDIENCE=https://api.example.com
 PORT=3000
 CORSORIGINS=https://app.example.com,https://admin.example.com
+DEVICECODELIFETIME=15m
 ```
 
 ### YAML Configuration
@@ -110,45 +118,45 @@ audience: "https://api.example.test"
 port: 3001
 
 branding:
-  serviceName: "MyApp"
-  primaryColor: "#3b82f6"
-  title: "Welcome"
-  subtitle: "Sign in to continue"
+    serviceName: "MyApp"
+    primaryColor: "#3b82f6"
+    title: "Welcome"
+    subtitle: "Sign in to continue"
 
 users:
-  - user_id: "auth0|user_1"
-    email: "user@example.com"
-    phone: "+14155551234"
-    name: "Test User"
-    email_verified: true
-    auth_method: "sms"  # or "email"
-    app_metadata:
-      tenant_id: "org_1"
-      role: "admin"
-    organizations:
-      - "org_1"
+    - user_id: "auth0|user_1"
+      email: "user@example.com"
+      phone: "+14155551234"
+      name: "Test User"
+      email_verified: true
+      auth_method: "sms" # or "email"
+      app_metadata:
+          tenant_id: "org_1"
+          role: "admin"
+      organizations:
+          - "org_1"
 
 organizations:
-  - id: "org_1"
-    name: "my-org"
-    display_name: "My Organization"
-    branding:
-      primary_color: "#3b82f6"
-    metadata:
-      tenant_id: "tenant_123"
+    - id: "org_1"
+      name: "my-org"
+      display_name: "My Organization"
+      branding:
+          primary_color: "#3b82f6"
+      metadata:
+          tenant_id: "tenant_123"
 
 connections:
-  - id: "con_sms"
-    name: "sms"
-    strategy: "sms"
-    display_name: "SMS"
-    organizations:
-      - "org_1"
+    - id: "con_sms"
+      name: "sms"
+      strategy: "sms"
+      display_name: "SMS"
+      organizations:
+          - "org_1"
 
 members:
-  - user_id: "auth0|user_1"
-    org_id: "org_1"
-    role: "admin"
+    - user_id: "auth0|user_1"
+      org_id: "org_1"
+      role: "admin"
 ```
 
 ### Custom Login Template
@@ -157,12 +165,12 @@ Mount your HTML at `/config/login.html` or use the Helm chart:
 
 ```yaml
 customLogin:
-  enabled: true
-  html: |
-    <!DOCTYPE html>
-    <html>
-    <!-- Your custom template -->
-    </html>
+    enabled: true
+    html: |
+        <!DOCTYPE html>
+        <html>
+        <!-- Your custom template -->
+        </html>
 ```
 
 Template must include `{{.SessionID}}` in form and support both `phone`, `email`, or `identifier` fields.
@@ -228,7 +236,9 @@ The response contains a `device_code`, an eight-character `user_code`, and a
 `verification_uri_complete`. Open the complete URI in a browser, or open
 `verification_uri` and enter the user code, then approve the request with a
 configured local user. The mock uses verification code
-`123456` and keeps device transactions in memory for 900 seconds. Clients
+`123456` and keeps device transactions in memory for 15 minutes; set
+`deviceCodeLifetime` (a duration such as `5s`) to shorten that when testing
+`expired_token`. Clients
 should poll `/oauth/token` no faster than the returned five-second `interval`.
 For a user-info-only token, omit `audience`; custom API requests must name the
 configured audience.
@@ -253,10 +263,10 @@ Tokens automatically include custom claims from `app_metadata` using the issuer 
 
 ```json
 {
-  "sub": "auth0|user_1",
-  "email": "user@example.com",
-  "https://auth.example.com/tenant_id": "org_1",
-  "https://auth.example.com/role": "admin"
+    "sub": "auth0|user_1",
+    "email": "user@example.com",
+    "https://auth.example.com/tenant_id": "org_1",
+    "https://auth.example.com/role": "admin"
 }
 ```
 
@@ -268,46 +278,58 @@ Declarative replacement for Auth0 Actions / Rules. Configured under `actions:` i
 
 ```yaml
 actions:
-  post_login:
-    # Namespaced claims (prefixed with the issuer URL)
-    id_token_claims:
-      role: "${user.app_metadata.role}"
-      phone_number: "${user.phone_number}"
-    # Top-level claims (no namespace) — for Auth0 standard claims like org_id
-    id_token_raw_claims:
-      org_id: "${user.app_metadata.tenant_id}"
-    access_token_claims:
-      role: "${authorization.role}"
-      phone_number: "${user.phone_number}"
-    access_token_raw_claims:
-      org_id: "${user.app_metadata.tenant_id}"
+    post_login:
+        # Namespaced claims (prefixed with the issuer URL)
+        id_token_claims:
+            role: "${user.app_metadata.role}"
+            phone_number: "${user.phone_number}"
+        # Top-level claims (no namespace) — for Auth0 standard claims like org_id
+        id_token_raw_claims:
+            org_id: "${user.app_metadata.tenant_id}"
+        access_token_claims:
+            role: "${authorization.role}"
+            phone_number: "${user.phone_number}"
+        access_token_raw_claims:
+            org_id: "${user.app_metadata.tenant_id}"
 ```
 
 Template syntax: `${path.dot.notation}`. Literals (no `${...}`) pass through unchanged. A claim whose template references an empty or missing path is **omitted** — matching the `if (event.user.x) api.idToken.setCustomClaim(...)` pattern in real Auth0 Actions.
 
 Available context paths:
 
-| Path | Source |
-|------|--------|
-| `user.user_id`, `user.email`, `user.phone_number`, `user.name` | User profile fields |
-| `user.app_metadata.tenant_id`, `user.app_metadata.role` | User `app_metadata` |
-| `user.user_metadata.*` | User `user_metadata` (any nested key) |
-| `authorization.role`, `authorization.org_id` | Looked up from `members` by the user's `app_metadata.tenant_id` |
-| `client.client_id`, `client.name` | The requesting client |
+| Path                                                           | Source                                                          |
+| -------------------------------------------------------------- | --------------------------------------------------------------- |
+| `user.user_id`, `user.email`, `user.phone_number`, `user.name` | User profile fields                                             |
+| `user.app_metadata.tenant_id`, `user.app_metadata.role`        | User `app_metadata`                                             |
+| `user.user_metadata.*`                                         | User `user_metadata` (any nested key)                           |
+| `authorization.role`, `authorization.org_id`                   | Looked up from `members` by the user's `app_metadata.tenant_id` |
+| `client.client_id`, `client.name`                              | The requesting client                                           |
 
 Equivalent to the following Auth0 Action snippet:
 
 ```js
 exports.onExecutePostLogin = async (event, api) => {
-  const namespace = 'https://auth.example.test';
-  if (event.authorization?.role) {
-    api.idToken.setCustomClaim(`${namespace}/role`, event.user.app_metadata.role);
-    api.accessToken.setCustomClaim(`${namespace}/role`, event.authorization.role);
-  }
-  if (event.user.phone_number) {
-    api.idToken.setCustomClaim(`${namespace}/phone_number`, event.user.phone_number);
-    api.accessToken.setCustomClaim(`${namespace}/phone_number`, event.user.phone_number);
-  }
+    const namespace = "https://auth.example.test";
+    if (event.authorization?.role) {
+        api.idToken.setCustomClaim(
+            `${namespace}/role`,
+            event.user.app_metadata.role,
+        );
+        api.accessToken.setCustomClaim(
+            `${namespace}/role`,
+            event.authorization.role,
+        );
+    }
+    if (event.user.phone_number) {
+        api.idToken.setCustomClaim(
+            `${namespace}/phone_number`,
+            event.user.phone_number,
+        );
+        api.accessToken.setCustomClaim(
+            `${namespace}/phone_number`,
+            event.user.phone_number,
+        );
+    }
 };
 ```
 
@@ -472,6 +494,7 @@ golangci-lint run
 ```
 
 Tests cover:
+
 - Complete OAuth2/OIDC flows with PKCE
 - SMS and email authentication
 - Custom claims in tokens
@@ -535,6 +558,7 @@ See [LICENSE](LICENSE) for details.
 ## Support
 
 For issues, feature requests, or questions:
+
 - GitHub Issues: https://github.com/46labs/auth0/issues
 - Documentation: This README
 
